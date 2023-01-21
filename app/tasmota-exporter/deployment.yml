@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tasmota
+  name: tasmota
+  namespace: tasmota
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tasmota
+  template:
+    metadata:
+      labels:
+        app: tasmota
+    spec:
+      containers:
+      - image: netzaffe/tasmota-exporter:1.1.4
+        name: tasmota-exporter
+        resources:
+            requests:
+              memory: "64Mi"
+              cpu: "64m"
+            limits:
+              memory: "128Mi"
+              cpu: "128m"
+        ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+        env:
+          - name: DEVICE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: configuration
+                key: name
+          - name: DEVICE_IP_ADDRESS
+            valueFrom:
+              configMapKeyRef:
+                name: configuration
+                key: ipaddress
